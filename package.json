@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare-gh-pages": "next build && rm -rf docs && mv out docs && touch docs/.nojekyll"
   },
   "dependencies": {
     "react": "^19.0.0",

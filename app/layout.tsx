@@ -1,5 +1,3 @@
-// Fix: Added missing React import to resolve 'Cannot find namespace React' error for React.ReactNode
-import React from 'react';
 import './globals.css';
 import type { Metadata } from 'next';
 
