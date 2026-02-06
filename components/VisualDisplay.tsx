@@ -222,6 +222,44 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
     });
   };
 
+  const handleBorrow = (place: keyof DigitState, accumulatedDigits?: Partial<DigitState>) => {
+    if (!onUpdateDigit) return;
+    
+    const borrowChain: Record<PlaceValue, PlaceValue | null> = {
+      ones: 'tens',
+      tens: 'hundreds',
+      hundreds: 'thousands',
+      thousands: null
+    };
+    
+    // Use accumulated changes if provided, otherwise use current state
+    const currentNextValue = accumulatedDigits?.[place] ?? digits[place];
+    const newNextValue = currentNextValue - 1;
+    
+    if (newNextValue < 0 && place !== 'thousands') {
+      // Need to borrow further from the next level up
+      const borrowFrom = borrowChain[place];
+      if (borrowFrom) {
+        const nextAccumulated = {
+          ...accumulatedDigits,
+          [place]: 9,
+        };
+        handleBorrow(borrowFrom, nextAccumulated);
+        return;
+      }
+    }
+    
+    // Apply all accumulated changes
+    const finalChanges: Partial<DigitState> = accumulatedDigits || {};
+    finalChanges[place] = newNextValue;
+    
+    (Object.keys(finalChanges) as Array<keyof DigitState>).forEach(key => {
+      if (finalChanges[key] !== digits[key]) {
+        onUpdateDigit(key, finalChanges[key]!);
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-8 w-full p-8 bg-white rounded-[3rem] border-4 border-blue-100 shadow-inner min-h-[500px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -233,6 +271,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
                 value={digits.thousands}
                 total={total}
                 onCarry={undefined}
+                onBorrow={undefined}
                 onChange={(v) => onUpdateDigit('thousands', v)} 
               />
             )}
@@ -252,6 +291,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
                 value={digits.hundreds}
                 total={total}
                 onCarry={() => handleCarry('thousands')}
+                onBorrow={() => handleBorrow('thousands')}
                 onChange={(v) => onUpdateDigit('hundreds', v)} 
               />
             )}
@@ -271,6 +311,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
                 value={digits.tens}
                 total={total}
                 onCarry={() => handleCarry('hundreds')}
+                onBorrow={() => handleBorrow('hundreds')}
                 onChange={(v) => onUpdateDigit('tens', v)} 
               />
             )}
@@ -290,6 +331,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
                 value={digits.ones}
                 total={total}
                 onCarry={() => handleCarry('tens')}
+                onBorrow={() => handleBorrow('tens')}
                 onChange={(v) => onUpdateDigit('ones', v)} 
               />
             )}

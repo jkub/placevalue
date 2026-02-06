@@ -9,9 +9,10 @@ interface DigitBoxProps {
   onChange: (val: number) => void;
   total?: number;
   onCarry?: () => void;
+  onBorrow?: () => void;
 }
 
-const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total = 0, onCarry }) => {
+const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total = 0, onCarry, onBorrow }) => {
   const [isOpen, setIsOpen] = useState(false);
   const colorSet = COLORS[type];
 
@@ -27,6 +28,13 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total
     thousands: 9000
   };
 
+  const borrowThresholds: Record<PlaceValue, number> = {
+    ones: 0,
+    tens: 9,
+    hundreds: 99,
+    thousands: 999
+  };
+
   const handleIncrement = () => {
     if (value < 9) {
       onChange(value + 1);
@@ -39,6 +47,9 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total
   const handleDecrement = () => {
     if (value > 0) {
       onChange(value - 1);
+    } else if (value === 0 && onBorrow && total > borrowThresholds[type]) {
+      onChange(9);
+      onBorrow();
     }
   };
 
@@ -47,7 +58,7 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total
       <div className="flex items-center justify-center gap-3">
         <button 
           onClick={handleDecrement}
-          disabled={value <= 0}
+          disabled={value <= 0 && (!onBorrow || total <= borrowThresholds[type])}
           className="w-12 h-12 rounded-full bg-gray-100 border-b-4 border-gray-300 text-gray-600 text-xl flex items-center justify-center hover:bg-gray-200 active:translate-y-1 active:border-b-0 transition-all pop-animation disabled:opacity-30 disabled:cursor-not-allowed"
           title="Minus One"
         >
