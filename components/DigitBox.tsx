@@ -18,9 +18,21 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange }) => 
     setIsOpen(false);
   };
 
+  const placeValues: Record<string, number> = {
+    thousands: 1000,
+    hundreds: 100,
+    tens: 10,
+    ones: 1
+  };
+
+  const value_number = placeValues[type];
+
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className={`font-kids text-xl uppercase tracking-widest ${colorSet.text}`}>{label}</span>
+      <div className={`font-kids text-lg uppercase tracking-widest ${colorSet.text} text-center`}>
+        <div>{label}</div>
+        <div className="text-sm font-bold">{value_number}</div>
+      </div>
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}

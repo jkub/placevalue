@@ -174,25 +174,37 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits }) => {
     <div className="flex flex-col gap-8 w-full p-8 bg-white rounded-[3rem] border-4 border-blue-100 shadow-inner min-h-[500px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-indigo-700 mb-8 bg-indigo-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase">Thousands</h3>
+            <h3 className="font-kids text-indigo-700 mb-8 bg-indigo-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+              <div>Thousands</div>
+              <div className="text-xs font-bold">1000</div>
+            </h3>
             <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
                 {displayDigits.thousands > 0 ? renderThousands() : <span className="text-gray-300 italic text-sm mt-4">Zero Thousands</span>}
             </div>
         </div>
         <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-emerald-700 mb-8 bg-emerald-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase">Hundreds</h3>
+            <h3 className="font-kids text-emerald-700 mb-8 bg-emerald-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+              <div>Hundreds</div>
+              <div className="text-xs font-bold">100</div>
+            </h3>
             <div className="flex flex-wrap gap-4 justify-center">
                 {displayDigits.hundreds > 0 ? renderHundreds() : <span className="text-gray-300 italic text-sm mt-4">Zero Hundreds</span>}
             </div>
         </div>
         <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-amber-700 mb-8 bg-amber-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase">Tens</h3>
+            <h3 className="font-kids text-amber-700 mb-8 bg-amber-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+              <div>Tens</div>
+              <div className="text-xs font-bold">10</div>
+            </h3>
             <div className="flex justify-center w-full">
                 {displayDigits.tens > 0 ? renderTens() : <span className="text-gray-300 italic text-sm mt-4">Zero Tens</span>}
             </div>
         </div>
         <div className="flex flex-col items-center px-4">
-            <h3 className="font-kids text-rose-700 mb-8 bg-rose-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase">Ones</h3>
+            <h3 className="font-kids text-rose-700 mb-8 bg-rose-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+              <div>Ones</div>
+              <div className="text-xs font-bold">1</div>
+            </h3>
             <div className="flex justify-center w-full">
                 {displayDigits.ones > 0 ? renderOnes() : <span className="text-gray-300 italic text-sm mt-4">Zero Ones</span>}
             </div>
