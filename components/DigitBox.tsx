@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { COLORS } from '../constants';
 import { PlaceValue } from '../types';
 
@@ -14,7 +14,23 @@ interface DigitBoxProps {
 
 const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total = 0, onCarry, onBorrow }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const colorSet = COLORS[type];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen]);
 
   const handleDigitSelect = (digit: number) => {
     onChange(digit);
@@ -54,7 +70,7 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange, total
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2" ref={dialogRef}>
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
