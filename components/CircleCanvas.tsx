@@ -16,74 +16,72 @@ const CircleCanvas: React.FC<CircleCanvasProps> = ({ digits }) => {
     ones: '#f43f5e'      // rose-500
   };
 
-  // Simple hash function to generate a seed from a string
-  const hashString = (str: string): number => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash);
-  };
-
-  // Seeded random number generator (Linear Congruential Generator)
-  const SeededRandom = (seed: number) => {
-    let value = seed;
-    return () => {
-      value = (value * 9301 + 49297) % 233280;
-      return value / 233280;
-    };
-  };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
 
+    const squareSize = 4;
+    const gap = 1;
+    const cellSize = squareSize + gap; // total space per square
+    const maxSquares = 10000;
+
     // Set canvas width to container width
-    canvas.width = container.offsetWidth;
+    const canvasWidth = container.offsetWidth;
+    const columnsWide = Math.floor(canvasWidth / cellSize);
+    const rowsNeeded = Math.ceil(maxSquares / columnsWide);
+    const canvasHeight = rowsNeeded * cellSize;
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Calculate total squares to fill
+    const total = (digits.thousands * 1000) + (digits.hundreds * 100) + (digits.tens * 10) + digits.ones;
 
-    const circleRadius = 2.5;
-    const padding = 10;
+    // Draw grid of squares, filling columns left to right, top to bottom within each column
+    let squareIndex = 0;
+    for (let col = 0; col < columnsWide; col++) {
+      for (let row = 0; row < rowsNeeded; row++) {
+        if (squareIndex >= total) break;
 
-    // Draw circles for each place value with deterministic placement
-    const drawCircles = (count: number, color: string, colorName: string) => {
-      // Create a seeded random generator for this color
-      const seed = hashString(colorName);
-      const rand = SeededRandom(seed);
+        const x = col * cellSize;
+        const y = row * cellSize;
 
-      ctx.fillStyle = color;
-      for (let i = 0; i < count; i++) {
-        const x = padding + rand() * (canvas.width - padding * 2);
-        const y = padding + rand() * (canvas.height - padding * 2);
-        
-        ctx.beginPath();
-        ctx.arc(x, y, circleRadius, 0, Math.PI * 2);
-        ctx.fill();
+        // Determine color based on which range this square falls in
+        let color = '#e5e7eb'; // gray for empty
+
+        const thousandsCount = digits.thousands * 1000;
+        const hundredsStart = thousandsCount;
+        const tensStart = hundredsStart + (digits.hundreds * 100);
+        const onesStart = tensStart + (digits.tens * 10);
+
+        if (squareIndex < thousandsCount) {
+          color = colors.thousands;
+        } else if (squareIndex < hundredsStart + (digits.hundreds * 100)) {
+          color = colors.hundreds;
+        } else if (squareIndex < tensStart + (digits.tens * 10)) {
+          color = colors.tens;
+        } else if (squareIndex < onesStart + digits.ones) {
+          color = colors.ones;
+        }
+
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, squareSize, squareSize);
+
+        squareIndex++;
       }
-    };
-
-    // Draw in order: thousands, hundreds, tens, ones
-    drawCircles(digits.thousands * 1000, colors.thousands, 'thousands');
-    drawCircles(digits.hundreds * 100, colors.hundreds, 'hundreds');
-    drawCircles(digits.tens * 10, colors.tens, 'tens');
-    drawCircles(digits.ones, colors.ones, 'ones');
+      if (squareIndex >= total) break;
+    }
   }, [digits]);
 
   return (
     <div ref={containerRef} className="w-full">
       <canvas
         ref={canvasRef}
-        height={250}
-        className="w-full border-2 border-gray-200 rounded-xl bg-white block"
+        className="w-full border-2 border-gray-200 rounded-xl bg-gray-50 block"
       />
     </div>
   );
