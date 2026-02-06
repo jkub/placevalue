@@ -11,22 +11,31 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits }) => {
   const [mergingColumn, setMergingColumn] = useState<string | null>(null);
   const [splittingColumn, setSplittingColumn] = useState<string | null>(null);
   const prevDigitsRef = useRef<DigitState>(digits);
+  const isAnimatingRef = useRef<boolean>(false);
 
   useEffect(() => {
     const prev = prevDigitsRef.current;
     const currentTotal = (digits.thousands * 1000) + (digits.hundreds * 100) + (digits.tens * 10) + digits.ones;
     const prevTotal = (prev.thousands * 1000) + (prev.hundreds * 100) + (prev.tens * 10) + prev.ones;
+    const displayTotal = (displayDigits.thousands * 1000) + (displayDigits.hundreds * 100) + (displayDigits.tens * 10) + displayDigits.ones;
 
-    if (Math.abs(currentTotal - prevTotal) === 1) {
-      handleStepTransition(prev, digits);
-    } else {
+    // If there's a large jump (multiple clicks during animation), sync display and handle the transition
+    if (Math.abs(currentTotal - displayTotal) > 1) {
       setDisplayDigits(digits);
+      prevDigitsRef.current = digits;
+      isAnimatingRef.current = false;
+    } else if (Math.abs(currentTotal - prevTotal) === 1 && !isAnimatingRef.current) {
+      handleStepTransition(prev, digits);
+      prevDigitsRef.current = digits;
+    } else if (Math.abs(currentTotal - prevTotal) !== 1) {
+      setDisplayDigits(digits);
+      prevDigitsRef.current = digits;
+      isAnimatingRef.current = false;
     }
-    
-    prevDigitsRef.current = digits;
-  }, [digits]);
+  }, [digits, displayDigits]);
 
   const handleStepTransition = async (oldVal: DigitState, newVal: DigitState) => {
+    isAnimatingRef.current = true;
     const isIncrement = ((newVal.thousands * 1000) + (newVal.hundreds * 100) + (newVal.tens * 10) + newVal.ones) > 
                         ((oldVal.thousands * 1000) + (oldVal.hundreds * 100) + (oldVal.tens * 10) + oldVal.ones);
 
@@ -96,6 +105,8 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits }) => {
       temp.ones = Math.max(0, temp.ones - 1);
       setDisplayDigits({ ...temp });
     }
+    
+    isAnimatingRef.current = false;
   };
 
   const renderThousands = () => {
