@@ -29,10 +29,6 @@ const DigitBox: React.FC<DigitBoxProps> = ({ type, value, label, onChange }) => 
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className={`font-kids text-lg uppercase tracking-widest ${colorSet.text} text-center`}>
-        <div>{label}</div>
-        <div className="text-sm font-bold">{value_number}</div>
-      </div>
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}

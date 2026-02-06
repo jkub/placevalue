@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { DigitState } from '../types';
+import DigitBox from './DigitBox';
 
 interface VisualDisplayProps {
   digits: DigitState;
+  onUpdateDigit?: (place: keyof DigitState, val: number) => void;
 }
 
-const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits }) => {
+const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) => {
   const [displayDigits, setDisplayDigits] = useState<DigitState>(digits);
   const [mergingColumn, setMergingColumn] = useState<string | null>(null);
   const [splittingColumn, setSplittingColumn] = useState<string | null>(null);
@@ -184,40 +186,72 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits }) => {
   return (
     <div className="flex flex-col gap-8 w-full p-8 bg-white rounded-[3rem] border-4 border-blue-100 shadow-inner min-h-[500px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-indigo-700 mb-8 bg-indigo-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4 gap-6">
+            {onUpdateDigit && (
+              <DigitBox 
+                type="thousands" 
+                label="Thousands" 
+                value={digits.thousands} 
+                onChange={(v) => onUpdateDigit('thousands', v)} 
+              />
+            )}
+            <h3 className="font-kids text-indigo-700 bg-indigo-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
               <div>Thousands</div>
               <div className="text-xs font-bold">1000</div>
             </h3>
             <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
-                {displayDigits.thousands > 0 ? renderThousands() : <span className="text-gray-300 italic text-sm mt-4">Zero Thousands</span>}
+                {digits.thousands > 0 ? renderThousands() : <span className="text-gray-300 italic text-sm mt-4">Zero Thousands</span>}
             </div>
         </div>
-        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-emerald-700 mb-8 bg-emerald-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4 gap-6">
+            {onUpdateDigit && (
+              <DigitBox 
+                type="hundreds" 
+                label="Hundreds" 
+                value={digits.hundreds} 
+                onChange={(v) => onUpdateDigit('hundreds', v)} 
+              />
+            )}
+            <h3 className="font-kids text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
               <div>Hundreds</div>
               <div className="text-xs font-bold">100</div>
             </h3>
             <div className="flex flex-wrap gap-4 justify-center">
-                {displayDigits.hundreds > 0 ? renderHundreds() : <span className="text-gray-300 italic text-sm mt-4">Zero Hundreds</span>}
+                {digits.hundreds > 0 ? renderHundreds() : <span className="text-gray-300 italic text-sm mt-4">Zero Hundreds</span>}
             </div>
         </div>
-        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4">
-            <h3 className="font-kids text-amber-700 mb-8 bg-amber-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+        <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4 gap-6">
+            {onUpdateDigit && (
+              <DigitBox 
+                type="tens" 
+                label="Tens" 
+                value={digits.tens} 
+                onChange={(v) => onUpdateDigit('tens', v)} 
+              />
+            )}
+            <h3 className="font-kids text-amber-700 bg-amber-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
               <div>Tens</div>
               <div className="text-xs font-bold">10</div>
             </h3>
             <div className="flex justify-center w-full">
-                {displayDigits.tens > 0 ? renderTens() : <span className="text-gray-300 italic text-sm mt-4">Zero Tens</span>}
+                {digits.tens > 0 ? renderTens() : <span className="text-gray-300 italic text-sm mt-4">Zero Tens</span>}
             </div>
         </div>
-        <div className="flex flex-col items-center px-4">
-            <h3 className="font-kids text-rose-700 mb-8 bg-rose-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
+        <div className="flex flex-col items-center px-4 gap-6">
+            {onUpdateDigit && (
+              <DigitBox 
+                type="ones" 
+                label="Ones" 
+                value={digits.ones} 
+                onChange={(v) => onUpdateDigit('ones', v)} 
+              />
+            )}
+            <h3 className="font-kids text-rose-700 bg-rose-50 px-4 py-1.5 rounded-full text-sm tracking-wider uppercase text-center">
               <div>Ones</div>
               <div className="text-xs font-bold">1</div>
             </h3>
             <div className="flex justify-center w-full">
-                {displayDigits.ones > 0 ? renderOnes() : <span className="text-gray-300 italic text-sm mt-4">Zero Ones</span>}
+                {digits.ones > 0 ? renderOnes() : <span className="text-gray-300 italic text-sm mt-4">Zero Ones</span>}
             </div>
         </div>
       </div>
