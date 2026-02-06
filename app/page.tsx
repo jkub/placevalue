@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import VisualDisplay from '../components/VisualDisplay';
 import CircleCanvas from '../components/CircleCanvas';
+import { COLORS } from '../constants';
 import { DigitState } from '../types';
 
 export default function Home() {
@@ -14,6 +15,13 @@ export default function Home() {
   });
 
   const total = (digits.thousands * 1000) + (digits.hundreds * 100) + (digits.tens * 10) + digits.ones;
+
+  const parts = {
+    thousands: digits.thousands * 1000,
+    hundreds: digits.hundreds * 100,
+    tens: digits.tens * 10,
+    ones: digits.ones
+  };
 
   const handleUpdateDigit = (place: keyof DigitState, val: number) => {
     setDigits(prev => ({ ...prev, [place]: val }));
@@ -64,6 +72,18 @@ export default function Home() {
             >
               <i className="fas fa-plus"></i>
             </button>
+          </div>
+
+          <div className="mt-4 text-lg font-kids text-gray-700 flex items-center gap-2">
+            <span className="text-gray-600 font-semibold">{total.toLocaleString()} =</span>
+
+            <span className={`${COLORS.thousands.text} font-bold`}>{parts.thousands.toLocaleString()}</span>
+            <span className="text-gray-400">+</span>
+            <span className={`${COLORS.hundreds.text} font-bold`}>{parts.hundreds.toLocaleString()}</span>
+            <span className="text-gray-400">+</span>
+            <span className={`${COLORS.tens.text} font-bold`}>{parts.tens.toLocaleString()}</span>
+            <span className="text-gray-400">+</span>
+            <span className={`${COLORS.ones.text} font-bold`}>{parts.ones.toLocaleString()}</span>
           </div>
 
           <CircleCanvas digits={digits} />
