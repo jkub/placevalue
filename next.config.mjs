@@ -4,7 +4,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/placevalue',
   trailingSlash: true,
   reactStrictMode: true,
 };
