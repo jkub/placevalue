@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { DigitState } from '../types';
+import { DigitState, PlaceValue } from '../types';
 import DigitBox from './DigitBox';
 
 interface VisualDisplayProps {
@@ -13,6 +13,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
   const [mergingColumn, setMergingColumn] = useState<string | null>(null);
   const [splittingColumn, setSplittingColumn] = useState<string | null>(null);
   const prevDigitsRef = useRef<DigitState>(digits);
+  const total = (digits.thousands * 1000) + (digits.hundreds * 100) + (digits.tens * 10) + digits.ones;
   const isAnimatingRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -183,6 +184,44 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
     );
   };
 
+  const handleCarry = (place: keyof DigitState, accumulatedDigits?: Partial<DigitState>) => {
+    if (!onUpdateDigit) return;
+    
+    const carryChain: Record<PlaceValue, PlaceValue | null> = {
+      ones: 'tens',
+      tens: 'hundreds',
+      hundreds: 'thousands',
+      thousands: null
+    };
+    
+    // Use accumulated changes if provided, otherwise use current state
+    const currentValue = accumulatedDigits?.[place] ?? digits[place];
+    const newValue = currentValue + 1;
+    
+    if (newValue === 10) {
+      // Need to carry further
+      const nextPlace = carryChain[place];
+      if (nextPlace) {
+        const nextAccumulated = {
+          ...accumulatedDigits,
+          [place]: 0,
+        };
+        handleCarry(nextPlace, nextAccumulated);
+        return;
+      }
+    }
+    
+    // Apply all accumulated changes
+    const finalChanges: Partial<DigitState> = accumulatedDigits || {};
+    finalChanges[place] = newValue;
+    
+    (Object.keys(finalChanges) as Array<keyof DigitState>).forEach(key => {
+      if (finalChanges[key] !== digits[key]) {
+        onUpdateDigit(key, finalChanges[key]!);
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-8 w-full p-8 bg-white rounded-[3rem] border-4 border-blue-100 shadow-inner min-h-[500px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -191,7 +230,9 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
               <DigitBox 
                 type="thousands" 
                 label="Thousands" 
-                value={digits.thousands} 
+                value={digits.thousands}
+                total={total}
+                onCarry={undefined}
                 onChange={(v) => onUpdateDigit('thousands', v)} 
               />
             )}
@@ -208,7 +249,9 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
               <DigitBox 
                 type="hundreds" 
                 label="Hundreds" 
-                value={digits.hundreds} 
+                value={digits.hundreds}
+                total={total}
+                onCarry={() => handleCarry('thousands')}
                 onChange={(v) => onUpdateDigit('hundreds', v)} 
               />
             )}
@@ -225,7 +268,9 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
               <DigitBox 
                 type="tens" 
                 label="Tens" 
-                value={digits.tens} 
+                value={digits.tens}
+                total={total}
+                onCarry={() => handleCarry('hundreds')}
                 onChange={(v) => onUpdateDigit('tens', v)} 
               />
             )}
@@ -242,7 +287,9 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
               <DigitBox 
                 type="ones" 
                 label="Ones" 
-                value={digits.ones} 
+                value={digits.ones}
+                total={total}
+                onCarry={() => handleCarry('tens')}
                 onChange={(v) => onUpdateDigit('ones', v)} 
               />
             )}
