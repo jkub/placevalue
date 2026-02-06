@@ -261,7 +261,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({ digits, onUpdateDigit }) 
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full p-8 bg-white rounded-[3rem] border-4 border-blue-100 shadow-inner min-h-[500px]">
+    <div className="flex flex-col w-full p-8 bg-white rounded-[1rem] border-4 border-blue-100 min-h-[500px]">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col items-center border-r-2 border-blue-50 last:border-0 px-4 gap-6">
             {onUpdateDigit && (

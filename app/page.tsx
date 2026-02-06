@@ -39,7 +39,7 @@ export default function Home() {
       </header>
 
       <main className="w-full flex flex-col gap-10">
-        <section className="bg-white p-8 rounded-[3rem] card-shadow flex flex-col items-center gap-6 border-4 border-blue-50">
+        <section className="flex flex-col items-center">
           <div className="text-gray-400 font-kids text-xl">Your Total Number Is:</div>
           
           <div className="flex items-center justify-center gap-6">
