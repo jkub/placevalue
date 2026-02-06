@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import VisualDisplay from '../components/VisualDisplay';
+import CircleCanvas from '../components/CircleCanvas';
 import { DigitState } from '../types';
 
 export default function Home() {
@@ -64,6 +65,8 @@ export default function Home() {
               <i className="fas fa-plus"></i>
             </button>
           </div>
+
+          <CircleCanvas digits={digits} />
         </section>
 
         <section>
